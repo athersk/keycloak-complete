@@ -1,0 +1,58 @@
+---
+version: '3.2'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    volumes:
+      - $PWD/postgres_data:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+
+  keycloak:
+    depends_on:
+      - postgres
+    container_name: keycloak
+    image: jboss/keycloak:14.0.0
+    environment:
+      DB_VENDOR: postgres
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+    ports:
+      - 81:8080
+  keycloak-proxy:
+    image: atherskcs/keycloak-proxy:latest
+    container_name: keycloak-proxy
+    environment:
+      TARGET_URL: http://192.168.29.237:5601/
+      HTTP_PORT: 8180
+      HTTPS_PORT: 8443
+      BASE_PATH: /
+      REALM_NAME: kibana
+      AUTH_SERVER_URL: http://192.168.29.237:81/auth
+      CLIENT_ID: kibana
+      ROLE_ALLOWED: user
+      SSL_REQUIRED: external
+    volumes:
+      - $PWD/keycloak/conf:/opt/jboss/conf
+    ports:
+      - 8180:8180
+
+volumes:
+  postgres_data:
+    driver: local
+
+volumes:
+  keycloak:
+    driver: local
