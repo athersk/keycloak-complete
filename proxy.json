@@ -1,0 +1,26 @@
+{
+    "target-url": "http://192.168.29.237:5601/",
+    "bind-address": "0.0.0.0",
+    "http-port": "8180",
+    "https-port": "8443",
+    "applications": [
+        {
+            "base-path": "/",
+            "adapter-config": {
+                "realm": "kibana",
+                "auth-server-url": "http://192.168.29.237:81/auth",
+                "public-client": true,
+                "resource": "kibana",
+                "ssl-required": "external"
+            },
+            "constraints": [
+                {
+                    "pattern": "/*",
+                    "roles-allowed": [
+                        "user"
+                    ]
+                }
+            ]
+        }
+    ]
+}
